@@ -1,7 +1,3 @@
-local function errorf (format, ...)
-  error(string.format(format, ...))
-end
-
 local function typecheck (t, types)
     for key, wantType in pairs(types) do
       -- if its a table check it
@@ -10,10 +6,11 @@ local function typecheck (t, types)
 
       elseif type(t[key]) ~= wantType then
         if wantType == nil then
-          errorf("key '%s' is not part of the struct", key)
+          error(string.format("key '%s' is not part of the struct", key))
         end
 
-        errorf("key '%s' want type '%s' got type '%s'", key, wantType, type(t[key]))
+        error(string.format("key '%s' want type '%s' got type '%s'",
+          key, wantType, type(t[key])))
       end
     end
 end
@@ -37,7 +34,7 @@ end
 -- it is type safe.
 local function struct (t)
   if type(t) ~= "table" then
-    errorf("bad argument #1 to 'struct' (table expected, got %s)", type(t))
+    error(string.format("bad argument #1 to 'struct' (table expected, got %s)", type(t)))
   end
 
   local types = allTypes(t)
