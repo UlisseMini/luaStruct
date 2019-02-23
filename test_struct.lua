@@ -13,6 +13,16 @@ local tests = {
     tests = {
       {
         fail = false; -- do we expect this test to fail
+        verify = function(obj)
+          if obj.name ~= "bob" then
+            return string.format("want name: bob; got name: %s", obj.name)
+          end
+
+          if obj.age ~= 30 then
+            return string.format("want age: 30; got age: %d", obj.age)
+          end
+        end,
+
         name = "bob";
         age  = 30;
       },
@@ -79,48 +89,102 @@ local tests = {
           {num = 10}
         }
       },
-    }
+    },
+  },
+  {
+    name = "unwanted";
+    obj  = struct {
+      name = "";
+      age  = 0;
+    },
+
+    tests = {
+      {
+        fail = true;
+
+        name     = "foo";
+        age      = 10;
+        unwanted = "invalid field";
+      },
+      {
+        fail = true;
+
+        name     = "bar";
+        age      = 10;
+        unwanted = {}
+      },
+    },
   },
 }
 
--- helper function
-local printf = function(s, ...)
-  io.write( s:format( ... ) )
+-- helper functions
+local printf  = function(s, ...) io.write( s:format( ... ) ) end
+local sprintf = function(s, ...) return s:format( ... )      end
+
+-- returns ok (bool), message (string)
+local function runTest (n, tc, group)
+    printf("  sub-%d%s",n, string.rep(" ", 4), n)
+
+    -- so we can verify the returned object
+    local obj
+    shouldFail = tc.fail
+    verify     = tc.verify
+
+    -- run it
+    local ok, err = pcall(function()
+      tc.fail   = nil
+      tc.verify = nil
+
+      obj = group.obj(tc)
+    end)
+
+    -- if it passed but should have failed raise an error
+    if ok and shouldFail then
+      return false, sprintf("  | FAIL: should have failed, but did not)")
+    end
+
+    -- if it failed but should not have raise an error
+    if not ok and not shouldFail then
+      return false, sprintf("  | FAIL: %s", err)
+    end
+
+    -- if it has a verify function execute it
+    if type(verify) == "function" then
+      if not obj then
+        return false, sprintf("  | FAIL: returned object is nil (verify object)")
+      end
+
+      err = verify(obj)
+      if err ~= nil then
+        return false, sprintf("  | FAIL: %s (verify object)", err, n)
+      end
+    end
+
+    -- all the tests passed, return ok
+    return true, sprintf("  | PASS")
 end
 
 -- run all the tests
 local failures, ran = 0, 0
 local start = os.clock()
-for _, test in pairs(tests) do
+for _, tGroup in pairs(tests) do
   -- write the test group we're running
-  printf("testing '%s'\n", test.name)
+  printf("testing '%s'\n", tGroup.name)
 
-  local passed = true
   -- run the test cases and check for errors.
-  for n, tc in pairs(test.tests) do
-    shouldFail = tc.fail
-    printf("  sub-%d"..string.rep(" ", 4), n)
+  local passed = true
+  for n, tc in pairs(tGroup.tests) do
+    local subPassed, msg = runTest(n, tc, tGroup)
+    print(msg)
 
-    -- run it
-    ok, err = pcall(function()
-      tc.fail = nil
-      local obj = test.obj(tc)
-    end)
-
-    -- if it passed but should have failed raise an error
-    if ok and shouldFail then
-      printf("  | FAIL: should have failed)\n", n)
+    if not subPassed then
       passed = false
-    -- if it failed but should not have raise an error
-    elseif not ok and not shouldFail then
-      printf("  | FAIL: should not have failed\n", n)
-      passed = false
-    else
-      printf("  | PASS\n", n)
     end
 
     ran = ran + 1
   end
+
+  -- print the message for the test group we ran
   if passed then
     print("PASSED\n")
   else
@@ -129,4 +193,4 @@ for _, test in pairs(tests) do
   end
 end
 
-printf("%d test failures, %d tests ran in %.4fs\n", failures, ran, os.clock() - start)
+printf("%d group failures, %d tests ran in %.4fs\n", failures, ran, os.clock() - start)
