@@ -32,4 +32,4 @@ invalid3 = person {
 	age = "name",
 }
 ```
-also works with nested tables and functions (only make sure it is a function, not the parmaters)
+also works with nested tables and functions (only makes sure it is a function, not the parmaters)
