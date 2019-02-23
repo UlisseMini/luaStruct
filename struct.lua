@@ -5,13 +5,16 @@ local function typecheck (t, types)
         typecheck(t[key], wantType)
 
       elseif type(t[key]) ~= wantType then
-        if wantType == nil then
-          error(string.format("key '%s' is not part of the struct", key))
-        end
-
         error(string.format("key '%s' want type '%s' got type '%s'",
           key, wantType, type(t[key])))
       end
+    end
+
+    -- check for unwanted fields being filled
+    for key, _ in pairs(t) do
+        if types[key] == nil then
+          error(string.format("key '%s' is not part of the struct", key))
+        end
     end
 end
 
