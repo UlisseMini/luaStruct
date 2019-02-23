@@ -109,11 +109,11 @@ for _, test in pairs(tests) do
 
     -- if it passed but should have failed raise an error
     if ok and shouldFail then
-      printf("  FAIL | should have failed)\n", n)
+      printf("  | FAIL: should have failed)\n", n)
       passed = false
     -- if it failed but should not have raise an error
     elseif not ok and not shouldFail then
-      printf("  FAIL | should not have failed\n", n)
+      printf("  | FAIL: should not have failed\n", n)
       passed = false
     else
       printf("  | PASS\n", n)
