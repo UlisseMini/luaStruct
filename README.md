@@ -33,6 +33,3 @@ invalid3 = person {
 }
 ```
 also works with nested tables and functions (only make sure it is a function, not the parmaters)
-
-# TODO
-* Write good unit tests
