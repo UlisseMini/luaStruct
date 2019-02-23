@@ -1,7 +1,7 @@
-## struct
+# struct
 > ever want type safe data structures in pure lua? you've came to the right place!
 
-# Example
+## Example
 ```lua
 local struct = require "struct"
 
