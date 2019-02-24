@@ -38,6 +38,12 @@ local default = person {}
 default:hello()     --> default name says hello
 print(default.age)  --> 21
 print(default.name) --> "default name"
+
+-- however, if we supply a wrong type an error will be raised,
+local invalid = person {
+	name = 10,
+	age = "invalid",
+}
 ```
 
-works with nested tables as well (if you don't trust me run ./test_struct.lua)
+all of this works with nested tables as well :)
