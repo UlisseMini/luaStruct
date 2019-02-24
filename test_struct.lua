@@ -1,5 +1,9 @@
 local struct = require "struct"
 
+-- helper functions
+local printf  = function (s, ...) io.write( s:format( ... ) ) end
+local sprintf = function (s, ...) return s:format( ... )      end
+
 local tests = {
   {
     name = "people",     -- testname
@@ -72,7 +76,8 @@ local tests = {
         },
       },
       {
-        fail = true,
+        -- will not fail because of defaults
+        fail = false,
         top = 10,
         sub = {}
       },
@@ -115,7 +120,7 @@ local tests = {
     obj  = struct {name = ""},
 
     -- create a method "hello"
-    function()
+    init = function (obj)
       function obj:hello()
         return self.name.." says hello!"
       end
@@ -187,8 +192,8 @@ local tests = {
       {
         fail = false,
         verify = function (o)
-          if o.sub ~= 10 then
-            return string.format("want o.sub: 10; got %d", o.sub)
+          if o.sub.n ~= 10 then
+            return string.format("want o.sub.n: 10; got %d", o.sub.n)
           end
         end,
 
@@ -198,13 +203,14 @@ local tests = {
   },
 }
 
--- helper functions
-local printf  = function(s, ...) io.write( s:format( ... ) ) end
-local sprintf = function(s, ...) return s:format( ... )      end
-
 -- returns ok (bool), message (string)
 local function runTest (n, tc, group)
     printf("  sub-%d%s",n, string.rep(" ", 4), n)
+
+    -- check for an init function
+    if type(group.init) == "function" then
+      group.init(group.obj)
+    end
 
     -- so we can verify the returned object
     local obj
@@ -215,6 +221,7 @@ local function runTest (n, tc, group)
     local ok, err = pcall(function()
       tc.fail   = nil
       tc.verify = nil
+      tc.init   = nil
 
       obj = group.obj(tc)
     end)

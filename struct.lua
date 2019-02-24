@@ -41,28 +41,25 @@ local function allTypes (t)
   return types
 end
 
--- Save copied tables in `copies`, indexed by original table.
--- TODO implement setDefaults
-function setDefaults(orig, copies)
-  copies = copies or {}
-  local orig_type = type(orig)
-  local copy
+-- returns an updated table
+function setDefaults (t, defaults)
+  -- if t is nil then set it to an empty table.
+  t = t or {}
 
-  if orig_type == 'table' then
-    if copies[orig] then
-      copy = copies[orig]
+  -- iterate over the defaults and set them if they are not supplied
+  for key, default in pairs(defaults) do
+    -- if the default is a table then run it on the subtable in t.
+    if type(default) == "table" then
+      t[key] = setDefaults(t[key], default)
     else
-      copy = {}
-      for orig_key, orig_value in next, orig, nil do
-        copy[deepcopy(orig_key, copies)] = deepcopy(orig_value, copies)
+      -- otherwise just set it to the default if t[key] is nil
+      if t[key] == nil then
+        t[key] = default
       end
-      copies[orig] = copy
-      setmetatable(copy, deepcopy(getmetatable(orig), copies))
     end
-  else -- number, string, boolean, etc
-    copy = orig
   end
-  return copy
+
+  return t
 end
 
 -- struct creates a new struct data structure from a table,
@@ -80,7 +77,7 @@ local function struct (t)
   -- calling the table returns the table with defaults (after typechecking it)
   mt.__call = function (self, o)
     -- TODO: Find a better way then looping, maybe __index
-    setDefaults(o, self)
+    o = setDefaults(o, self)
 
     -- typecheck the values (ignores extra functions)
     typecheck(o, types)
