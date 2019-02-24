@@ -311,3 +311,4 @@ for _, tGroup in pairs(tests) do
 end
 
 printf("%d group failures, %d tests ran in %.4fs\n", failures, ran, os.clock() - start)
+if failures > 0 then os.exit(1) end
