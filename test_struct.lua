@@ -199,6 +199,9 @@ local tests = {
     obj  = struct {
       sub = {
         n = 10,
+        sub2 = {
+          m = "hello"
+        }
       },
     },
 
@@ -213,6 +216,18 @@ local tests = {
 
         sub = nil
       },
+      {
+        fail = false,
+        verify = function (o)
+          -- lots of nested, use pcall for safty agenst nil
+          local ok, err = pcall(function()
+            if o.sub.sub2.m ~= "hello" then
+              error( string.format("want 'hello', got '%s'", o.sub.sub2.m) )
+            end
+          end)
+          if not ok then return err end
+        end,
+      }
     }
   },
 }
