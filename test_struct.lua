@@ -19,7 +19,7 @@ local tests = {
         fail = false, -- do we expect this test to fail
         verify = function(obj)
           if obj.name ~= "bob" then
-            return string.format("want name: bob, got name: '%s'", obj.name)
+            return string.format("want name: bob, got name: %q", obj.name)
           end
 
           if obj.age ~= 30 then
@@ -136,7 +136,7 @@ local tests = {
           local msg = o:hello()
 
           if msg ~= "bobby says hello!" then
-            return string.format("want: 'bobby says hello!', got '%s'", msg)
+            return string.format("want: 'bobby says hello!', got %q", msg)
           end
         end,
 
@@ -151,7 +151,7 @@ local tests = {
 
           local m = o.echo("hello")
           if m ~= "hello" then
-            return string.format("want: 'hello', got '%s'", m)
+            return string.format("want: 'hello', got %q", m)
           end
         end,
 
@@ -180,7 +180,7 @@ local tests = {
       {
         verify = function (o)
           if o.name ~= 'jen' then
-            return string.format("want name 'jen'; got name '%s'", o.name)
+            return string.format("want name 'jen'; got name %q", o.name)
           end
 
           if o.age ~= 11 then
@@ -222,7 +222,7 @@ local tests = {
           -- lots of nested, use pcall for safty agenst nil
           local ok, err = pcall(function()
             if o.sub.sub2.m ~= "hello" then
-              error( string.format("want 'hello', got '%s'", o.sub.sub2.m) )
+              error( string.format("want 'hello', got %q", o.sub.sub2.m) )
             end
           end)
           if not ok then return err end
@@ -286,7 +286,7 @@ local failures, ran = 0, 0
 local start = os.clock()
 for _, tGroup in pairs(tests) do
   -- write the test group we're running
-  printf("testing '%s'\n", tGroup.name)
+  printf("testing %q\n", tGroup.name)
 
   -- run the test cases and check for errors.
   local passed = true
