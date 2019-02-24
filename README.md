@@ -5,31 +5,39 @@
 ```lua
 local struct = require "struct"
 
+-- create a new struct
 person = struct {
-  name = "",
-  age  = 0,
+  name = "default name",
+  age  = 21
 }
 
--- this works
-uli = person {
+-- add a method (function) to the struct person, this will be added to every new
+-- person and can be called with "name:hello()" where "name" is the new person.
+function person:hello()
+  print(self.name.." says hello")
+end
+
+-- create a new person "uli"
+local uli = person {
   name = "uli",
-  age = 14,
+  age  = 14
 }
 
--- this does not
-invalid1 = person {
-  not_existing_key = "something",
-  name = "invalid",
-  age = 0,
+-- create a new person "james"
+local james = person {
+  name = "james",
+  age  = 13
 }
 
--- this also fails
-invalid2 = person {}
+uli:hello()   --> uli says hello
+james:hello() --> james says hello
 
--- annd this fails
-invalid3 = person {
-	name = 21,
-	age = "name",
-}
+-- also works with defaults
+local default = person {}
+
+default:hello()     --> default name says hello
+print(default.age)  --> 21
+print(default.name) --> "default name"
 ```
-also works with nested tables and functions (only makes sure it is a function, not the parmaters)
+
+works with nested tables as well (if you don't trust run ./test_struct.lua)
