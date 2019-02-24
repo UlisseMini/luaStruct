@@ -40,4 +40,4 @@ print(default.age)  --> 21
 print(default.name) --> "default name"
 ```
 
-works with nested tables as well (if you don't trust run ./test_struct.lua)
+works with nested tables as well (if you don't trust me run ./test_struct.lua)
