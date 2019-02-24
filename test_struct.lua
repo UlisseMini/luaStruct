@@ -119,15 +119,15 @@ local tests = {
     name = "methods",
     obj  = struct {name = ""},
 
-    -- create a method "hello"
+    -- create some methods
     init = function (obj)
-      function obj:hello()
-        return self.name.." says hello!"
-      end
+      function obj:hello()     return self.name.." says hello!" end
+      function obj.echo(thing) return thing                     end
     end,
 
     tests = {
       {
+        fail = false,
         verify = function (o)
           if type(o.hello) ~= "function" then
             return "object does not have method 'hello'"
@@ -139,9 +139,23 @@ local tests = {
             return string.format("want: 'bobby says hello!', got '%s'", msg)
           end
         end,
-        fail = false,
 
         name = "bobby"
+      },
+      {
+        fail = false,
+        verify = function (o)
+          if type(o.echo) ~= "function" then
+            return "object does not have method 'echo'"
+          end
+
+          local m = o.echo("hello")
+          if m ~= "hello" then
+            return string.format("want: 'hello', got '%s'", m)
+          end
+        end,
+
+        name = "jerry"
       },
     }
   },
