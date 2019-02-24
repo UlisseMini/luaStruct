@@ -234,7 +234,7 @@ local tests = {
 
 -- returns ok (bool), message (string)
 local function runTest (n, tc, group)
-    printf("  sub-%d%s",n, string.rep(" ", 4), n)
+    printf("  sub-%d\t", n)
 
     -- check for an init function
     if type(group.init) == "function" then
