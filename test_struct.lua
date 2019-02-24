@@ -2,62 +2,62 @@ local struct = require "struct"
 
 local tests = {
   {
-    name = "people";     -- testname
+    name = "people",     -- testname
     obj  = struct {      -- the struct to use
       -- a person must have a name and an age
-      name = "";
-      age  = 0;
+      name = "",
+      age  = 0,
     },
 
     -- test cases to execute
     tests = {
       {
-        fail = false; -- do we expect this test to fail
+        fail = false, -- do we expect this test to fail
         verify = function(obj)
           if obj.name ~= "bob" then
-            return string.format("want name: bob; got name: %s", obj.name)
+            return string.format("want name: bob, got name: '%s'", obj.name)
           end
 
           if obj.age ~= 30 then
-            return string.format("want age: 30; got age: %d", obj.age)
+            return string.format("want age: 30, got age: %d", obj.age)
           end
         end,
 
-        name = "bob";
-        age  = 30;
+        name = "bob",
+        age  = 30,
       },
       {
-        fail = true;
-        name = 10;
-        age  = "jerry";
+        fail = true,
+        name = 10,
+        age  = "jerry",
       }
     },
   },
   {
-    name = "functions";
+    name = "functions",
     obj  = struct {
       hi = function() end,
     },
 
     tests = {
       {
-        fail = false;
+        fail = false,
         hi   = function() end
       },
       {
-        fail = true;
+        fail = true,
         hi   = "bobcat"
       },
       {
-        fail = true;
+        fail = false,
         hi   = nil
       },
     }
   },
   {
-    name = "nested";
+    name = "nested",
     obj  = struct {
-      top = 0;
+      top = 0,
       sub = {
         num = 0
       }
@@ -65,26 +65,20 @@ local tests = {
 
     tests = {
       {
-        fail = false;
-        top = 10;
+        fail = false,
+        top = 10,
         sub = {
-          num = 10;
+          num = 10,
         },
       },
       {
-        fail = true;
-        sub = {
-          num = 10;
-        },
-      },
-      {
-        fail = true;
-        top = 10;
+        fail = true,
+        top = 10,
         sub = {}
       },
       {
-        fail = true;
-        top = 10;
+        fail = true,
+        top = 10,
         sub = {
           {num = 10}
         }
@@ -92,28 +86,115 @@ local tests = {
     },
   },
   {
-    name = "unwanted";
+    name = "unwanted",
     obj  = struct {
-      name = "";
-      age  = 0;
+      name = "",
+      age  = 0,
     },
 
     tests = {
       {
-        fail = true;
+        fail = true,
 
-        name     = "foo";
-        age      = 10;
-        unwanted = "invalid field";
+        name     = "foo",
+        age      = 10,
+        unwanted = "invalid field",
       },
       {
-        fail = true;
+        fail = true,
 
-        name     = "bar";
-        age      = 10;
+        name     = "bar",
+        age      = 10,
         unwanted = {}
       },
     },
+  },
+
+  {
+    name = "methods",
+    obj  = struct {name = ""},
+
+    -- create a method "hello"
+    function()
+      function obj:hello()
+        return self.name.." says hello!"
+      end
+    end,
+
+    tests = {
+      {
+        verify = function (o)
+          if type(o.hello) ~= "function" then
+            return "object does not have method 'hello'"
+          end
+
+          local msg = o:hello()
+
+          if msg ~= "bobby says hello!" then
+            return string.format("want: 'bobby says hello!', got '%s'", msg)
+          end
+        end,
+        fail = false,
+
+        name = "bobby"
+      },
+    }
+  },
+  {
+    name = "defaults",
+    obj = struct {
+      name = "jen",
+      age  = 10,
+    },
+
+    tests = {
+      {
+        verify = function (o)
+          if o.age ~= 10 then
+            return string.format("want age 10; got age %s", o.age)
+          end
+        end,
+        fail = false,
+
+        name = "bob",
+      },
+      {
+        verify = function (o)
+          if o.name ~= 'jen' then
+            return string.format("want name 'jen'; got name '%s'", o.name)
+          end
+
+          if o.age ~= 11 then
+            return string.format("want age: 11 (non default), got age %d", o.age)
+          end
+        end,
+        fail = false,
+
+        age = 11,
+      },
+    }
+  },
+
+  {
+    name = "nested defaults",
+    obj  = struct {
+      sub = {
+        n = 10,
+      },
+    },
+
+    tests = {
+      {
+        fail = false,
+        verify = function (o)
+          if o.sub ~= 10 then
+            return string.format("want o.sub: 10; got %d", o.sub)
+          end
+        end,
+
+        sub = nil
+      },
+    }
   },
 }
 
