@@ -1,28 +1,28 @@
 -- typecheck returns nothing, works because tables operate via pointers.
 -- typecheck DOES NOT need to deal with defaults
 local function typecheck (t, types)
-    if t == nil then
-      error(string.format("bad argument #1 to 'typecheck' (table expected, got %s)",
-        type(t)))
-    end
+    assert(type(t) == "table",
+      string.format("bad argument #1 to 'typecheck' (table expected, got %s)", type(t))
+    )
 
     for key, wantType in pairs(types) do
-      -- if we want a table check it
+      -- if the expected type is a table call ourselves on it.
       if type(wantType) == "table" then
         typecheck(t[key], wantType)
-
-      elseif type(t[key]) ~= wantType then
-        error(string.format("key '%s' want type '%s' got type '%s'",
-          key, wantType, type(t[key])))
+      else
+        -- make sure it is the type we expect
+        assert(type(t[key]) == wantType,
+          string.format("key '%s' want type '%s' got type '%s'", key, wantType, type(t[key]))
+        )
       end
     end
 
     -- check for unwanted fields being filled,
-    -- ignore functions because methods okay.
+    -- ignore functions because methods are okay.
     for key, val in pairs(t) do
-        if types[key] == nil and type(val) ~= "function" then
-          error(string.format("key '%s' is not part of the struct", key))
-        end
+        assert(types[key] == nil and type(val) ~= "function",
+          string.format("key '%s' is not part of the struct", key)
+        )
     end
 end
 
@@ -65,9 +65,9 @@ end
 -- struct creates a new struct data structure from a table,
 -- it is type safe.
 local function struct (t)
-  if type(t) ~= "table" then
-    error(string.format("bad argument #1 to 'struct' (table expected, got %s)", type(t)))
-  end
+  assert(type(t) == "table",
+    string.format("bad argument #1 to 'struct' (table expected, got %s)", type(t))
+  )
 
   local types = allTypes(t)
 
