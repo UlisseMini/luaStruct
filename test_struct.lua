@@ -227,6 +227,30 @@ local tests = {
           end)
           if not ok then return err end
         end,
+
+        -- leaving sub2 set to {}
+        sub = {
+          n = 20,
+          sub2 = {}
+        }
+      },
+      {
+        fail = false,
+        verify = function (o)
+          -- lots of nested, use pcall for safty agenst nil
+          local ok, err = pcall(function()
+            if o.sub.sub2.m ~= "hello" then
+              error( string.format("want 'hello', got %q", o.sub.sub2.m) )
+            end
+          end)
+          if not ok then return err end
+        end,
+
+        -- leaving sub2 set to nil
+        sub = {
+          n = 20,
+          sub2 = nil
+        }
       }
     }
   },
