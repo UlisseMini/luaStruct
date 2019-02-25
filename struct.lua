@@ -76,7 +76,9 @@ local function struct (t)
   local mt = {}
   -- calling the table returns the table with defaults (after typechecking it)
   mt.__call = function (self, o)
-    -- TODO: Find a better way then looping, maybe __index
+    -- Using setDefaults because when i use __index it does not set
+    -- defaults correctly if o is {}, only when o is nil.
+    -- (maybe applying __index recursively?)
     o = setDefaults(o, self)
 
     -- typecheck the values (ignores extra functions)
