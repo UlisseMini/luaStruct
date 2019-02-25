@@ -1,6 +1,14 @@
 # struct
 > ever want type safe data structures in pure lua? you've came to the right place!
 
+## Installation
+Install luarocks then run
+`luarocks install luastruct`
+then you can use it in your programs via
+```lua
+local struct = require "struct"
+```
+
 ## Example
 ```lua
 local struct = require "struct"
