@@ -20,9 +20,10 @@ local function typecheck (t, types)
     -- check for unwanted fields being filled,
     -- ignore functions because methods are okay.
     for key, val in pairs(t) do
-        assert(types[key] == nil and type(val) ~= "function",
-          string.format("key '%s' is not part of the struct", key)
-        )
+        -- if it is not a function then go boom
+        if types[key] == nil and type(val) ~= "function" then
+          error(string.format("key '%s' is not part of the struct", key))
+        end
     end
 end
 
